@@ -29,18 +29,36 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <body>
 <%
 if (session.getAttribute("UserID") != null&&session.getAttribute("UserID").toString().equals("admin")) {
+	
+	long usmID = Long.parseLong(request.getParameter("usmID").toString());
 	String userID = request.getParameter("userID").toString();
-	String userList = System.getProperty("catalina.base")+File.separator+"ESBAdmin"+File.separator+"Users";
-	File userFile = new File(System.getProperty("catalina.base")
-			+File.separator+ "ESBAdmin"+File.separator+userID);
-	//remove the directory to remove user
 	Util newUtil = new Util();
-	newUtil.deleteDirectory(userFile);
-	boolean flag = newUtil.updateUser(userList,userID);
-	System.out.println(flag);
-	if(flag){
+	Connection conn = null;
+	ResultSet rs = null;
+	
+	try{
+		conn = newUtil.createConn();
+		Statement stmt = conn.createStatement();
+		
+		String delUserQmgr = "DELETE FROM USER_QMGR_MSTR WHERE UQSM_USER_ID = (SELECT USM_USER_ID FROM USER_MSTR WHERE USM_ID = "+usmID+")"; 
+		String delIIB = "DELETE FROM USER_IIB_MSTR WHERE UIBM_USER_ID = (SELECT USM_USER_ID FROM USER_MSTR WHERE USM_ID = "+usmID+")";
+		String qAccess = "DELETE FROM QADM_MSTR WHERE QAM_UQSM_ID = "+usmID;
+		String delUser = "DELETE FROM USER_MSTR WHERE USM_ID = "+usmID;
+		
+		//delete qmgr access
+		stmt.execute(delUserQmgr);
+		//delete iib access
+		stmt.execute(delIIB);
+		//delete q access
+		stmt.execute(qAccess);
+		//delete user
+		stmt.execute(delUser);
+
+	}finally{
+		conn.close();
+		
 		%>
-		<center>User <%=userID %> removed from the system successfully.</center>
+		<center>User <b><%=userID %></b> removed from the system successfully.</center>
 		<%
 	}
 	

@@ -75,7 +75,6 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			String qChannel = null;
 
 			MQAdminUtil newMQAdUtil = new MQAdminUtil();
-			List<Map<String, String>> MQList = newMQAdUtil.getQMEnv(UserID);
 
 			if(rs.next()){
 				qPort = rs.getInt("QSM_QMGR_PORT");
@@ -87,7 +86,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			PCFCommons newPFCCM = new PCFCommons();
 			if (request.getParameter("qName") != null){
 				String resOutput = newPFCCM.createQueue(qHost, 
-						Integer.parseInt(qPort), 
+						qPort, 
 						request.getParameter("qType").toString(), 
 						request.getParameter("qName").toString(), 
 						Boolean.parseBoolean(request.getParameter("xmitType")),
@@ -106,7 +105,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 
 			if (request.getParameter("chanName")!= null){
 				newPFCCM.createChannel(qHost, 
-						Integer.parseInt(qPort), 
+						qPort, 
 						request.getParameter("chanType").toString(), 
 						request.getParameter("chanName").toString(), 
 						request.getParameter("xmitQueue"),
@@ -133,7 +132,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 				}
 				
 				newPFCCM.createListener(qHost, 
-						Integer.parseInt(qPort), 
+						qPort, 
 						request.getParameter("listType").toString(), 
 						request.getParameter("listName").toString(), 
 						portNum,
@@ -150,7 +149,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 	
 			if (request.getParameter("topicName")!= null){
 				newPFCCM.createTopic(qHost, 
-						Integer.parseInt(qPort), 
+						qPort, 
 						request.getParameter("topicName").toString(), 
 						request.getParameter("topicString").toString(), 
 						request.getParameter("topicDesc").toString(),
@@ -168,7 +167,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 
 			if (request.getParameter("subName")!= null){
 				newPFCCM.createSub(qHost, 
-						Integer.parseInt(qPort), 
+						qPort, 
 						request.getParameter("subName").toString(), 
 						request.getParameter("topicString").toString(), 
 						request.getParameter("subTopicName").toString(),

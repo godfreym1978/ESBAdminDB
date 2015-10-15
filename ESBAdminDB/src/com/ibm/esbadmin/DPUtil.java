@@ -227,6 +227,7 @@ public class DPUtil {
 								rs[serviceCtr].getQuiesceStatus());
 						iMap.put("AdminStatus", 
 								rs[serviceCtr].getAdminStatus());
+						
 						deviceListDtl.add(iMap);
 					}
 				}

@@ -395,10 +395,10 @@ public class MQAdminUtil {
 		}
 	}
 
-	public ArrayList<String> messageMove(String qMgr, String qPortStr,
+	public ArrayList<String> messageMove(String qMgr, int qPortStr,
 			String qHost, String srcQueueName, String tarQueueName,
 			String msgCnt) throws MQException, IOException {
-		int qPort = Integer.parseInt(qPortStr);
+		int qPort = qPortStr;
 		int msgCount = 0;
 		if (!msgCnt.equals("all")) {
 			msgCount = Integer.parseInt(msgCnt);

@@ -17,6 +17,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="java.sql.*"%>
 <%@ page import="java.net.*,java.io.*"%>
 <%@ page
 	import="org.apache.commons.fileupload.*,org.apache.commons.io.*"%>
@@ -40,31 +41,44 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 		</center>
 	<%	
 	}else{
-		
 		String UserID = session.getAttribute("UserID").toString();
 		
-		String qMgr = request.getParameter("qMgr");
-		String qPort = null;
-		String qHost = null;
-		String qChannel = null;
-
-		MQAdminUtil newMQAdUtil = new MQAdminUtil();
-		List<Map<String, String>> MQList = newMQAdUtil.getQMEnv(UserID);
-
-		for (int i=0; i<MQList.size(); i++) {
-			if(MQList.get(i).get("QMName").toString().equals(qMgr)){
-				qHost = MQList.get(i).get("QMHost").toString();
-				qPort = MQList.get(i).get("QMPort").toString();
-				qChannel = MQList.get(i).get("QMChannel").toString();
-				break;
-			}
-		}
-
+		Connection conn = null;
+		ResultSet rs = null;
 		Util newUtil = new Util();
-		String srcQueueName = request.getParameter("srcQueueName");
+		
+		try{
+			String qMgr = request.getParameter("qMgr");
+			
+			long qMgrID = Long.parseLong(qMgr);
+			
+			String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL, QSM_QMGR_NAME FROM QMGR_MSTR "+
+					"WHERE QSM_ID = "+qMgrID;
+			
+			conn = newUtil.createConn();
+			Statement stmt = conn.createStatement();
+			rs = stmt.executeQuery(usrQmgrQuery);
+			int qPort=0;
+			String qHost = null;
+			String qChannel = null;
+			
+			if(rs.next()){
+			qPort = rs.getInt("QSM_QMGR_PORT");
+			qHost = rs.getString("QSM_QMGR_HOST");
+			qChannel = rs.getString("QSM_QMGR_CHL");
+			qMgr = rs.getString("QSM_QMGR_NAME");
+			}
+
+			PCFCommons newPFCCM = new PCFCommons();
+			
+			
+				String srcQueueName = request.getParameter("srcQueueName");
 		String tarQueueName = request.getParameter("tarQueueName");
 		String msgCount = request.getParameter("msgCount");
 		ArrayList<String> messagesMoved = null;
+		
+		MQAdminUtil newMQAdUtil = new MQAdminUtil();  
+		
 		if (msgCount.equals("")){
 			messagesMoved = 
 				newMQAdUtil.messageMove(qMgr,qPort,qHost,srcQueueName,tarQueueName,"all");
@@ -100,6 +114,18 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			</tr>
 			
 		<%
+		}
+		}catch(Exception e){
+			%>
+			<center>
+			We have encountered the following error<br>
+			
+			<font color=red><b><%=e%></b></font> 
+			</center>
+			<%
+		}finally{
+			rs.close();
+			newUtil.closeConn(conn);
 		}
 	}
 			 %>	

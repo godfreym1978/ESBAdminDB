@@ -44,44 +44,41 @@ try{
 		if (newUtil.md5Digest(Passwd).equals(rs.getString("USM_PASSWD"))){
 			session.setAttribute("UserID", UserID);
 			session.setAttribute("UserName", rs.getString("USM_USER_NAME"));
-		%>
-		<FRAMESET cols="20%, 80%">
-		      <FRAME name="static" src='Login.jsp?UserID=<%=request.getParameter("UserID")%>'>/>
-		      <FRAME name="dynamic" src='Readme.html'/>
-		</FRAMESET>
+			%>
+			<FRAMESET cols="20%, 80%">
+			      <FRAME name="static" src='Login.jsp?UserID=<%=request.getParameter("UserID")%>'>/>
+			      <FRAME name="dynamic" src='Readme.html'/>
+			</FRAMESET>
 		<%}else{%>
 			<center>
 			Sorry Password does not match!!!!<br>
 			
 			Please login <a href='Index.html'><b>Here</b> </a>
 			</center>
-			<%
-		}
+		<%}
 	}else{
-		System.out.println("user not found");
 		if(UserID.equals("admin")){
 			System.out.println("admin user logging");
-			String createUsrStmt = "INSERT INTO USER_MSTR VALUES(USER_MSTR_SEQ.NEXTVAL,'admin','admin','"+newUtil.md5Digest(Passwd)+"')";
+			String createUsrStmt = "INSERT INTO USER_MSTR VALUES("+newUtil.retLong()+",'admin','admin','"+newUtil.md5Digest(Passwd)+"')";
 			stmt.execute(createUsrStmt);
 			session.setAttribute("UserID", "admin");
 			session.setAttribute("UserName", "admin");
 			session.setAttribute("usmid", 1);
 			System.out.println("about to check user"+request.getParameter("UserID"));
-		%>
-		<FRAMESET cols="20%, 80%">
-		      <FRAME name="static" src='Login.jsp?UserID=<%=request.getParameter("UserID")%>'>/>
-		      <FRAME name="dynamic" src='Readme.html'/>
-		</FRAMESET>
+			%>
+			<FRAMESET cols="20%, 80%">
+			      <FRAME name="static" src='Login.jsp?UserID=<%=request.getParameter("UserID")%>'>/>
+			      <FRAME name="dynamic" src='Readme.html'/>
+			</FRAMESET>
 		<%}else{%>
 			<center>
 			Sorry No user by that name exist!!!!<br>
 				
 			Please login with a valid user id <a href='Index.html'><b>Here</b> </a>
 			</center>
-			<%	
+		<%	
 		}
 	}
-	
 }catch(NullPointerException ex){
 	%>
 	<center>

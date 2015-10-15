@@ -18,6 +18,8 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
 <%@ page import="org.apache.commons.csv.*"%>
+<%@ page import="java.sql.*" %>
+
 <%@ page
 	import="org.apache.commons.fileupload.*,org.apache.commons.io.*,java.io.*"%>
 
@@ -52,27 +54,31 @@ if(session.getAttribute("UserID")==null){%>
 }else{
 	String UserID = session.getAttribute("UserID").toString();
 	if(UserID.equals("admin")){
+		Connection conn = null;
+		ResultSet rs = null;
+		Util newUtil = new Util();
+		PCFCommons newPFCCM = new PCFCommons();
+
 		try{ 
-			String qMgr = request.getParameter("qMgr");
-			String qPort = null;
+			String qMgrID = request.getParameter("qMgr");
+			String qMgr = null;
+
+			String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
+					"WHERE QSM_ID = "+qMgrID;
+			conn = newUtil.createConn();
+			Statement stmt = conn.createStatement();
+			rs = stmt.executeQuery(usrQmgrQuery);
+			int qPort=0;
 			String qHost = null;
 			String qChannel = null;
-
-			MQAdminUtil newMQAdUtil = new MQAdminUtil();
-			List<Map<String, String>> MQList = newMQAdUtil.getQMEnv(UserID);
-
-			for (int i=0; i<MQList.size(); i++) {
-				if(MQList.get(i).get("QMName").toString().equals(qMgr)){
-					qHost = MQList.get(i).get("QMHost").toString();
-					qPort = MQList.get(i).get("QMPort").toString();
-					qChannel = MQList.get(i).get("QMChannel").toString();
-					break;
-				}
-			}
 			
-			Util newUtil = new Util();
-		
-			PCFCommons newPFCCM = new PCFCommons();
+			if(rs.next()){
+				qPort = rs.getInt("QSM_QMGR_PORT");
+				qHost = rs.getString("QSM_QMGR_HOST");
+				qChannel = rs.getString("QSM_QMGR_CHL");
+				qMgr = rs.getString("QSM_QMGR_NAME");
+			}
+
 		
 		 %>
 
@@ -82,7 +88,7 @@ if(session.getAttribute("UserID")==null){%>
 						</a>
 						<div id="col2">
 							<div id="CreateQueue" class="hidden">
-								<form action='CreateObjectRep.jsp?qMgr=<%=qMgr%>' method="post">
+								<form action='CreateObjectRep.jsp?qMgr=<%=qMgrID%>' method="post">
 								
 								<table border=1 align=center class="gridtable">
 										<tr><td>Queue Name</td><td><input type=text name=qName></td></tr>
@@ -122,7 +128,7 @@ if(session.getAttribute("UserID")==null){%>
 						</a>
 						<div id="col2">
 							<div id="CreateChannel" class="hidden">
-								<form action='CreateObjectRep.jsp?qMgr=<%=qMgr%>' method="post">
+								<form action='CreateObjectRep.jsp?qMgr=<%=qMgrID%>' method="post">
 								
 								<table border=1 align=center class="gridtable">
 										<tr><td>Channel Name</td><td><input type=text name=chanName></td></tr>
@@ -159,7 +165,7 @@ if(session.getAttribute("UserID")==null){%>
 						</a>
 						<div id="col2">
 							<div id="CreateListener" class="hidden">
-								<form action='CreateObjectRep.jsp?qMgr=<%=qMgr%>' method="post">
+								<form action='CreateObjectRep.jsp?qMgr=<%=qMgrID%>' method="post">
 								<table border=1 align=center class="gridtable">
 										<tr><td>Listener Name</td><td><input type=text name=listName></td></tr>
 										<tr><td>Listener Type</td>
@@ -190,7 +196,7 @@ if(session.getAttribute("UserID")==null){%>
 						</a>
 						<div id="col2">
 							<div id="CreateTopic" class="hidden">
-								<form action='CreateObjectRep.jsp?qMgr=<%=qMgr%>' method="post">
+								<form action='CreateObjectRep.jsp?qMgr=<%=qMgrID%>' method="post">
 								<table border=1 align=center class="gridtable">
 										<tr><td>Topic Name</td><td><input type=text name=topicName></td></tr>
 										<tr><td>Topic String</td><td><input type=text name=topicString></td></tr>
@@ -213,7 +219,7 @@ if(session.getAttribute("UserID")==null){%>
 						</a>
 						<div id="col2">
 							<div id="CreateSubscription" class="hidden">
-								<form action='CreateObjectRep.jsp?qMgr=<%=qMgr%>' method="post">
+								<form action='CreateObjectRep.jsp?qMgr=<%=qMgrID%>' method="post">
 								
 								<table border=1 align=center class="gridtable">
 										<tr><td>Subscription Name</td><td><input type=text name=subName></td></tr>
@@ -238,19 +244,18 @@ if(session.getAttribute("UserID")==null){%>
 
 		<%
 		}catch(Exception e){
-			%>
-			<center> <b>Experienced the following error  - </b></center><br>
+		%>
+			We have encountered the following error<br>
+			<font color=red><b><%=e%></b></font> 
 			<%
-		    for (StackTraceElement element : e.getStackTrace()) {
-		    	%>
-		        <%=element.toString()%><br>
-		        <%
-		    }
+		}finally{
+			rs.close();
+			newUtil.closeConn(conn);
 		}
 	}
 }
 
-System.gc();
+
 	 %>
 </body>
 </html>

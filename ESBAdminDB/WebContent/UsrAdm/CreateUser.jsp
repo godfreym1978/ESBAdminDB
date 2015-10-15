@@ -16,6 +16,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 	pageEncoding="ISO-8859-1"%>
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="java.sql.*"%>
 <%@ page import="org.apache.commons.csv.*"%>
 <%@ page
 	import="org.apache.commons.fileupload.*,org.apache.commons.io.*,java.io.*"%>
@@ -27,14 +28,18 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 </style>
 </head>
 <body>
-	<%
-if (session.getAttribute("UserID") != null&&session.getAttribute("UserID").toString().equals("admin")) {
-	File qmFile = new File(System.getProperty("catalina.base")
-			+ File.separator+"ESBAdmin"+File.separator+"admin"+File.separator+"QMEnv.txt");
-	File mbFile = new File(System.getProperty("catalina.base")
-			+ File.separator+"ESBAdmin"+File.separator+"admin"+File.separator+"MBEnv.txt");
+	<%if (session.getAttribute("UserID") != null&&session.getAttribute("UserID").toString().equals("admin")) {
 	
-%>
+		Util newUtil = new Util();
+		Connection conn = null;
+		ResultSet rsQmgr = null;
+		ResultSet rsIIB = null;
+		
+		conn = newUtil.createConn();
+		Statement stmt = conn.createStatement();
+		String qmgrMstr = "SELECT * FROM QMGR_MSTR ";
+		String iibMstr = "SELECT * FROM IIB_MSTR ";
+	%>
 	<form action='CreateAccessUser.jsp' method="post">
 		<table align=center borders=1 class="gridtable">
 			<tr>
@@ -46,72 +51,51 @@ if (session.getAttribute("UserID") != null&&session.getAttribute("UserID").toStr
 				<td><input type="password" name="Pwd" /></td>
 			</tr>
 			<tr>
-				<td>Queue Manager(Host)</td>
-				<td>Allow Access</td>
+				<th>Queue Manager(Host)</th>
+				<th>Allow Access</th>
 			</tr>
 			<%
-			
-			String UserID = session.getAttribute("UserID").toString();
-			String qMgr = null;
-			String qPort = null;
-			String qHost = null;
-			String qChannel = null;
-
-			MQAdminUtil newMQAdUtil = new MQAdminUtil();
-			List<Map<String, String>> MQList = newMQAdUtil.getQMEnv(UserID);
-
-			for (int i=0; i<MQList.size(); i++) {
-					qMgr = MQList.get(i).get("QMName").toString();
-					qHost = MQList.get(i).get("QMHost").toString();
-			%>
-			<tr>
-				<td>Queue Manager - <%=qMgr%> , Host - <%=qHost%></td>
-				<td><input type="checkbox" name="QueueMgr" value="<%=MQList.get(i).get("QMTimeID").toString()%>"></td>
-			</tr>
-			<%
+			try{
+				rsQmgr = stmt.executeQuery(qmgrMstr);
+				while(rsQmgr.next()) {
+				%>
+					<tr>
+						<td>Queue Manager - <%=rsQmgr.getString("QSM_QMGR_NAME")%> , Host - <%=rsQmgr.getString("QSM_QMGR_HOST")%></td>
+						<td><input type="checkbox" name="QueueMgr" value="<%=rsQmgr.getLong("QSM_ID")%>"></td>
+					</tr>
+				<%}%>
+				<tr>
+					<th>Broker (Host)</th>
+					<th>Allow Access</th>
+				</tr>
+				<%
+				rsIIB = stmt.executeQuery(iibMstr);
+				while(rsIIB.next()) {
+					%>
+					<tr>
+						<td>Host - <%=rsIIB.getString("IBMST_IIB_HOST")%> , QM Port <%=rsIIB.getString("IBMST_QMGR_PORT")%></td>
+						<td><input type="checkbox" name="Broker" value="<%=rsIIB.getLong("IBMST_ID")%>"></td>
+					</tr>
+					<%
 				} 
-			%>
-			<tr>
-				<td>Broker (Host)</td>
-				<td>Allow Access</td>
-			</tr>
-			<%
-			String env = null;
-			String hostName = null;
-			int portNum;
-			MBCommons newMBCmn = new MBCommons();
-			List<Map<String, String>> MBList = newMBCmn.getMBEnv(UserID);
-			for(int i=0; i<MBList.size();i++){
-
-				env = MBList.get(i).get("MBEnv").toString();
-				hostName = MBList.get(i).get("MBHost").toString();
-				portNum = Integer.parseInt(MBList.get(i).get("MBPort").toString());
-				
-
-			%>
-			<tr>
-				<td>Environment - <%=env%> , Host - <%=hostName%> , QM Port <%=portNum%></td>
-				<td><input type="checkbox" name="Broker" value="<%=MBList.get(i).get("MBTimeID").toString()%>"></td>
-			</tr>
-			<%
-				} 
+			}catch(SQLException sqlEx){
+				sqlEx.printStackTrace();
+			}finally{
+				rsQmgr.close();
+				rsIIB.close();
+				newUtil.closeConn(conn);
+			}
 			%>
 			<tr>
 				<td colspan=2><input type="submit" value="CreateUser" /></td>
 			</tr>
 		</table>
 		</form>
-		<%
-}else{
-	%>
+	<%}else{%>
 		<center>
 			<b>You don't have access to this page.<br> Please login with
 				a valid user id <a href='../Index.html'><b>Here</b> </a></b>
-			<center>
-				<%
-}
-
-		%>
-			
+		<center>
+	<%}%>
 </body>
 </html>

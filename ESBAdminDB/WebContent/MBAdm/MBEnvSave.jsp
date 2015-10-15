@@ -98,10 +98,10 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 					MQQueueManager qmgr = new MQQueueManager(QMName);
 					qmgr.disconnect();
 
-					String insertQmgrMstrQuery = "INSERT INTO QMGR_MSTR VALUES(QMGR_MSTR_SEQ.NEXTVAL,'"+QMName+"','"+MBHost+"',"+MBPort+",'"+QMChannel+"' )";
+					String insertQmgrMstrQuery = "INSERT INTO QMGR_MSTR VALUES("+newUtil.retLong()+",'"+QMName+"','"+MBHost+"',"+MBPort+",'"+QMChannel+"' )";
 					stmt.execute(insertQmgrMstrQuery);
 					
-					String insertUserQmgrMstrQuery = "INSERT INTO USER_QMGR_MSTR VALUES(USER_QMGR_MSTR_SEQ.NEXTVAL,'"+UserID+"',"+
+					String insertUserQmgrMstrQuery = "INSERT INTO USER_QMGR_MSTR VALUES("+newUtil.retLong()+",'"+UserID+"',"+
 													" (SELECT QSM_ID FROM QMGR_MSTR "+ 
 															" WHERE QSM_QMGR_NAME = '"+QMName+"'"+
 							 								" AND QSM_QMGR_HOST = '"+MBHost+"'))";
@@ -125,10 +125,10 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 					BrokerConnectionParameters bcp = new MQBrokerConnectionParameters(MBHost,MBPort, "");
 					BrokerProxy brkProxy = BrokerProxy.getInstance(bcp);
 					brkProxy.disconnect();
-					String insertIIBMstrQuery = "INSERT INTO IIB_MSTR VALUES(IIB_MSTR_SEQ.NEXTVAL,'"+MBEnv+"','"+MBName+"','"+MBHost+"',"+MBPort+" )";
+					String insertIIBMstrQuery = "INSERT INTO IIB_MSTR VALUES("+newUtil.retLong()+",'"+MBEnv+"','"+MBName+"','"+MBHost+"',"+MBPort+" )";
 					stmt.execute(insertIIBMstrQuery);
 					
-					String insertIIBQmgrMstrQuery = "INSERT INTO USER_IIB_MSTR VALUES(USER_IIB_MSTR_SEQ.NEXTVAL,'"+UserID+"',"+
+					String insertIIBQmgrMstrQuery = "INSERT INTO USER_IIB_MSTR VALUES("+newUtil.retLong()+",'"+UserID+"',"+
 													" (SELECT IBMST_ID FROM IIB_MSTR "+ 
 															" WHERE IBMST_IIB_NAME = '"+MBName+"'"+
 							 								" AND IBMST_IIB_HOST = '"+MBHost+"'))";

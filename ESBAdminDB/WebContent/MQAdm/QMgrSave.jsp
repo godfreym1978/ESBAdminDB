@@ -95,10 +95,10 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 					MQEnvironment.hostname = QMHost;
 					MQQueueManager qmgr = new MQQueueManager(QMName);
 					qmgr.disconnect();
-					String insertQmgrMstrQuery = "INSERT INTO QMGR_MSTR VALUES(QMGR_MSTR_SEQ.NEXTVAL,'"+QMName+"','"+QMHost+"',"+QMPort+",'"+QMChannel+"' )";
+					String insertQmgrMstrQuery = "INSERT INTO QMGR_MSTR VALUES("+newUtil.retLong()+",'"+QMName+"','"+QMHost+"',"+QMPort+",'"+QMChannel+"' )";
 					stmt.execute(insertQmgrMstrQuery);
 					
-					String insertUserQmgrMstrQuery = "INSERT INTO USER_QMGR_MSTR VALUES(USER_QMGR_MSTR_SEQ.NEXTVAL,'"+UserID+"',"+
+					String insertUserQmgrMstrQuery = "INSERT INTO USER_QMGR_MSTR VALUES("+newUtil.retLong()+",'"+UserID+"',"+
 													" (SELECT QSM_ID FROM QMGR_MSTR "+ 
 															" WHERE QSM_QMGR_NAME = '"+QMName+"'"+
 							 								" AND QSM_QMGR_HOST = '"+QMHost+"'))";

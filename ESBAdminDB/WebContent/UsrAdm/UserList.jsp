@@ -17,34 +17,32 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
+<%@ page import="java.sql.*" %>
 <%@ page
 	import="org.apache.commons.fileupload.*,org.apache.commons.io.*,java.io.*"%>
 
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-<style type="text/css">
-<%@ include file="../Style.css" %>
-</style>
-<title>User List</title>
-</head>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+		<style type="text/css">
+			<%@ include file="../Style.css" %>
+		</style>
+		<title>User List</title>
+	</head>
 <body>
-<%if(session.getAttribute("UserID")==null){
-%>
-	<center>
-	Looks like you are not logged in.<br>
-		
-	Please login with a valid user id <a href='../Index.html'><b>Here</b> </a>
-	</center>
-<%	
-}else{
-	if(session.getAttribute("UserID").toString().equals("admin")){
-		try{ 
+	<%if(session.getAttribute("UserID")==null){%>
+		Looks like you are not logged in.<br>
+		Please login with a valid user id <a href='../Index.html'><b>Here</b> </a>
+	<%}else{
+		String UserID = session.getAttribute("UserID").toString();
+		if(UserID.equals("admin")){
+			Connection conn = null;
+			ResultSet rs = null;
 			Util newUtil = new Util();
-							
-			File userFile = new File(System.getProperty("catalina.base")
-									+ File.separator+"ESBAdmin"+File.separator+"Users");
-			if(userFile.exists()){
+			try{ 
+				conn = newUtil.createConn();
+				Statement stmt = conn.createStatement();
+				rs = stmt.executeQuery("SELECT * FROM USER_MSTR ");
 				%>
 				<center>The list of users for this site.</center>
 				<table border=1 align=center class="gridtable">
@@ -52,25 +50,22 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 						<td><b>User Name</b></td>
 						<td><b>Remove User</b></td>
 					</tr>
-		
-					<%
-					for (String line : FileUtils.readLines(userFile)) {
-					%>
+				<%while(rs.next()){%>
 					<tr>
-						<td><%=line%></td>
-						<td><a href='RemUser.jsp?userID=<%=line%>'> <b>YES</b>
-						</a></td> 
-						<%
-						} 
-				}
-			%>
+						<td><%=rs.getString("USM_USER_ID")%></td>
+						<td><a href='RemUser.jsp?userID=<%=rs.getString("USM_USER_ID")%>&usmID=<%=rs.getLong("USM_ID")%>'> <b>YES</b></a></td>
+					</tr>	 
+				<%}%>
 				</table>
-			<%
-		}catch(Exception e){
-			e.printStackTrace();
+				<%
+			}catch(Exception e){
+				e.printStackTrace();
+			}finally{
+				rs.close();
+				newUtil.closeConn(conn);
+			}
 		}
 	}
-}
-%>
+	%>
 </body>
 </html>

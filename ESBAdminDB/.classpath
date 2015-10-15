@@ -13,5 +13,21 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-dvs.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-engine.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-language.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-mbean-descriptors.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-dsmbean.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-execution.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-jsr94.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-manage-tools.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-memory-agentclient.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-session-java.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-setup.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-tools.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-validation.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/com.ibm.ws.admin.client_8.5.0.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/management.jar"/>
+	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/JmxRuleappSample.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

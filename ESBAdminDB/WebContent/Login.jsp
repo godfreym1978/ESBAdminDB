@@ -47,7 +47,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			String UserID = new String();
 			String queryString = new String();
 			Map<String, Object> map = new HashMap<String, Object>();
-			String[] qMgrDtl = new String[3];
+			//String[] qMgrDtl = new String[3];
 			if (session.getAttribute("UserID") != null) {
 				UserID = session.getAttribute("UserID").toString();
 	%>
@@ -69,11 +69,9 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 										" FROM USER_QMGR_MSTR UQM, QMGR_MSTR QMST "+
 										" WHERE UQM.UQSM_USER_ID = '"+UserID+"'"+
 										" AND UQM.UQSM_QSM_ID = QMST.QSM_ID "	);
-	
-	
-	int userQsmID;
+	long userQsmID;
 	while(rs.next()){
-		userQsmID = rs.getInt("UQSM_QSM_ID");
+		userQsmID = rs.getLong("UQSM_QSM_ID");
 	%>
 	<a href="javascript:unhide('<%=rs.getString("QSM_QMGR_NAME")%>');"> <b>Queue Manager - <%=rs.getString("QSM_QMGR_NAME")%>
 			/ Host - <%=rs.getString("QSM_QMGR_HOST")%>

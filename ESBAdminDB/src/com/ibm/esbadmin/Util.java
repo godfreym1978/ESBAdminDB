@@ -13,6 +13,10 @@
 
 package com.ibm.esbadmin;
 
+import java.util.Date;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,6 +60,16 @@ public class Util {
 	static final char CARRIAGE_RETURN = 13;
 	static final String fileSep = File.separator;
 
+	public long retLong() {
+		DateFormat dateFormat = new SimpleDateFormat("yyMMddHHmmssSSSSSS");
+		Date date = new Date();
+		String strDate = dateFormat.format(date).toString();
+		long intDate = Long.parseLong(strDate);
+		return intDate ;
+	}
+	
+
+	
 	public String md5Digest(String pwd) throws NoSuchAlgorithmException {
 		MessageDigest msgDig = MessageDigest.getInstance("MD5");
 		msgDig.reset();
