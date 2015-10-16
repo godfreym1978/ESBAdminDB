@@ -22,15 +22,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import javax.xml.stream.XMLStreamException;
 
-import org.apache.commons.csv.*;
-import org.apache.commons.io.*;
-
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.sql.*;
 
 /**
  * Servlet implementation class DownloadMsg
@@ -52,86 +45,103 @@ public class DownloadQObject extends HttpServlet {
 	 *      response)
 	 */
 	protected void doGet(HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException  {
+			HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		HttpSession session = request.getSession(true);
 
-		if(session.getAttribute("UserID") != null){
+		if (session.getAttribute("UserID") != null) {
+			Connection conn = null;
+			ResultSet rs = null;
+			Util newUtil = new Util();
+
 			try {
 
-				String UserID = session.getAttribute("UserID").toString();
 				response.setContentType("text/plain");
-				response.setHeader("Content-Disposition", "attachment;filename="
-						+ request.getParameter("objName").toString() + ".mqsc");
-	
+				response.setHeader("Content-Disposition",
+						"attachment;filename="
+								+ request.getParameter("objName").toString()
+								+ ".mqsc");
+
 				OutputStream outStream = response.getOutputStream();
 				byte[] qMgrBytes;
-				String qMgr = request.getParameter("qMgr");
+				int qMgrID = Integer.parseInt(request.getParameter("qMgr")
+						.toString());
+
 				int qPort = 0;
 				String qHost = null;
 				String qChannel = null;
-				MQAdminUtil newMQAdUtil = new MQAdminUtil();
-	
-				List<Map<String, String>> MQList = newMQAdUtil.getQMEnv(UserID);
 
-				for (int i=0; i< MQList.size(); i++) {
-					if(MQList.get(i).get("QMName").toString().equals(qMgr)){
-						qHost = MQList.get(i).get("QMHost").toString();
-						qPort = 
-								Integer.parseInt(MQList.get(i).get("QMPort").toString());
-						qChannel = MQList.get(i).get("QMChannel").toString();
-						break;
-					}
+				String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "
+						+ "WHERE QSM_ID = " + qMgrID;
+				conn = newUtil.createConn();
+				Statement stmt = conn.createStatement();
+				rs = stmt.executeQuery(usrQmgrQuery);
+
+				if (rs.next()) {
+					qPort = rs.getInt("QSM_QMGR_PORT");
+					qHost = rs.getString("QSM_QMGR_HOST");
+					qChannel = rs.getString("QSM_QMGR_CHL");
 				}
+
 				String objType = request.getParameter("objType").toString();
 				String objName = request.getParameter("objName").toString();
 
 				PCFCommons pcfCM = new PCFCommons();
 
 				if (objType.equals("QUEUE")) {
-					qMgrBytes = String.valueOf(
-							pcfCM.createQScript(qHost, qPort,
-									objName, qChannel)).getBytes();
+					qMgrBytes = String
+							.valueOf(
+									pcfCM.createQScript(qHost, qPort, objName,
+											qChannel)).getBytes();
 					outStream.write(qMgrBytes);
 				}
 
 				if (objType.equals("CHANNEL")) {
 					qMgrBytes = String.valueOf(
-							pcfCM.createChlScript(qHost, qPort,
-									objName, qChannel)).getBytes();
+							pcfCM.createChlScript(qHost, qPort, objName,
+									qChannel)).getBytes();
 					outStream.write(qMgrBytes);
 				}
 
 				if (objType.equals("LISTENER")) {
 					qMgrBytes = String.valueOf(
-							pcfCM.createListScript(qHost, qPort,
-									objName, qChannel)).getBytes();
+							pcfCM.createListScript(qHost, qPort, objName,
+									qChannel)).getBytes();
 					outStream.write(qMgrBytes);
 				}
 
 				if (objType.equals("TOPIC")) {
 					qMgrBytes = String.valueOf(
-							pcfCM.createTopicScript(qHost, qPort,
-									objName, qChannel)).getBytes();
+							pcfCM.createTopicScript(qHost, qPort, objName,
+									qChannel)).getBytes();
 					outStream.write(qMgrBytes);
 				}
 
 				if (objType.equals("SUB")) {
 					qMgrBytes = String.valueOf(
-							pcfCM.createSubScript(qHost, qPort, 
-									objName, qChannel)).getBytes();
+							pcfCM.createSubScript(qHost, qPort, objName,
+									qChannel)).getBytes();
 					outStream.write(qMgrBytes);
 				}
-				
+
 				outStream.flush();
 				outStream.close();
-
+			} catch (SQLException se) {
+				se.printStackTrace();
 			} catch (Exception e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				newUtil.closeConn(conn);
 			}
+
 		} else {
 			System.out.println("Not logged in");
 		}
-		System.gc();
 	}
 }
