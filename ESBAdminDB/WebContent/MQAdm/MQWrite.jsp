@@ -17,6 +17,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="java.util.*" %>
+<%@ page import="java.sql.*" %>
 <%@ page import="java.net.*,java.io.*"%>  
 <%@ page import="org.apache.commons.fileupload.*,org.apache.commons.io.*" %>
 
@@ -42,17 +43,41 @@ if(session.getAttribute("UserID")==null){
 		Please login with a valid user id <a href='../Index.html'><b>Here</b> </a>
 		</center>
 <%}else{
-	
+		Util newUtil = new Util();
+		String UserID = session.getAttribute("UserID").toString();
+		Connection conn = null;
+		ResultSet rs = null;
+
+		long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
+		
+		String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
+				"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
+									" WHERE UQSM_USER_ID = '"+UserID+"' "+
+									" AND UQSM_QSM_ID = "+qMgrID+")";
+		conn = newUtil.createConn();
+		Statement stmt = conn.createStatement();
+		rs = stmt.executeQuery(usrQmgrQuery);
+		int qPort=0;
+		String qHost = null;
+		String qChannel = null;
+		String gMgrName = null;
+		
+		if(rs.next()){
+			qPort = rs.getInt("QSM_QMGR_PORT");
+			qHost = rs.getString("QSM_QMGR_HOST");
+			qChannel = rs.getString("QSM_QMGR_CHL");
+			gMgrName = rs.getString("QSM_QMGR_NAME");
+		}
 
 				// Create a new file upload handler 
-				DiskFileUpload upload = new DiskFileUpload();
 
+				DiskFileUpload upload = new DiskFileUpload();
 				// parse request
 				List items = upload.parseRequest(request);
 
 				// get qMgr Name
 				String qMgr = new String();
-				qMgr = request.getParameter("QMgr").toString();
+				//qMgr = request.getParameter("QMgr").toString();
 
 				//get qName
 				String qName = new String();
@@ -66,7 +91,7 @@ if(session.getAttribute("UserID")==null){
 				file.write(outfile);
 
 				MQAdminUtil newMQAdmUtil = new MQAdminUtil();
-				String returnMsg = newMQAdmUtil.writeMessageToQueue(qMgr, qName,
+				String returnMsg = newMQAdmUtil.writeMessageToQueue(gMgrName, qName,
 						FileUtils.readFileToString(outfile));
 			%>
 			<table border=1 align=center width=100% class="gridtable">

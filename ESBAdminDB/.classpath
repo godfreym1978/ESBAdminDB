@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/jre8">
-		<attributes>
-			<attribute name="owner.project.facets" value="java"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.server.core.container/org.eclipse.jst.server.tomcat.runtimeTarget/Apache Tomcat v8.0">
 		<attributes>
 			<attribute name="owner.project.facets" value="jst.web"/>
@@ -26,8 +21,8 @@
 	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-setup.jar"/>
 	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-res-tools.jar"/>
 	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/jrules-validation.jar"/>
-	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/com.ibm.ws.admin.client_8.5.0.jar"/>
 	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/management.jar"/>
 	<classpathentry kind="lib" path="D:/Build/apache-tomcat-8.0.22/lib/JmxRuleappSample.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

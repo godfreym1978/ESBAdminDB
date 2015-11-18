@@ -56,7 +56,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 		Util newUtil = new Util();
 		
 		try{
-			int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+			long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 			
 			String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 										"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+

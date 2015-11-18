@@ -123,7 +123,7 @@ public class MQAdminUtil {
 	};
 
 	public ArrayList browseQueue(String queueMgr, String queueName) {
-
+		
 		SimpleDateFormat dateFormat = new SimpleDateFormat(
 				"MM.dd.yyyy HH:mm:ss");
 		ArrayList<String> qMessages = new ArrayList<String>();
@@ -227,6 +227,7 @@ public class MQAdminUtil {
 	public String writeMessageToQueue(String queueMgr, String queueName,
 			String qMessage) {
 		String returnMsg = null;
+		
 		try {
 			MQQueueManager qMgr = new MQQueueManager(queueMgr);
 			int openOptions = 17;

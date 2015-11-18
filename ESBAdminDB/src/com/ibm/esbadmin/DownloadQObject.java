@@ -64,8 +64,8 @@ public class DownloadQObject extends HttpServlet {
 
 				OutputStream outStream = response.getOutputStream();
 				byte[] qMgrBytes;
-				int qMgrID = Integer.parseInt(request.getParameter("qMgr")
-						.toString());
+				//int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+				long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 
 				int qPort = 0;
 				String qHost = null;

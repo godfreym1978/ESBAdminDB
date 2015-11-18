@@ -15,6 +15,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="java.util.*" %>
 <%@ page import="java.io.*" %>
+<%@ page import="java.sql.*" %>
 <%@ page
 	import="org.apache.commons.fileupload.*,org.apache.commons.io.*,java.io.*"%>
 
@@ -38,62 +39,48 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 
 <%	
 }else{
-
+	String UserID = session.getAttribute("UserID").toString();
 	String []newStr = request.getParameterValues("Queue");
 	String qMgr = request.getParameter("qMgr").toString();
+	long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 	List<String> setupQueue = new ArrayList<String>();
 	
 	Util newUtil = new Util();
-	File queueFile = new File(System.getProperty("catalina.base")+ File.separator+"ESBAdmin"
-								+File.separator+session.getAttribute("UserID").toString()+File.separator
-								+qMgr);
 	
-	if (!queueFile.exists()){
-		queueFile.createNewFile();
-	}
-
+	Connection conn = null;
+	ResultSet rs = null;
+	
 	int lineCtr = 0;
-	
-	for (String line : FileUtils.readLines(queueFile)) {
-		setupQueue.add(lineCtr, line);
-		lineCtr++;
-	}
+	int newQCtr;
 
-	if(setupQueue.size()==0){
-		int newQCtr;
+	try{
+		conn = newUtil.createConn();
+		Statement stmt = conn.createStatement();
+		
 		for (newQCtr=0;newQCtr<newStr.length;newQCtr++){
-				if(newQCtr==(newStr.length-1)){
-					FileUtils.writeStringToFile(queueFile, newStr[newQCtr].toString().trim(), true);	
-				}else{
-					FileUtils.writeStringToFile(queueFile, newStr[newQCtr].toString().trim()+"\n", true);
-				}
-				
+			rs = stmt.executeQuery("SELECT * FROM QADM_MSTR WHERE QAM_UQSM_ID = "+qMgrID+" AND QSM_Q_NAME = '"+newStr[newQCtr].toString().trim()+"'");
+			if(rs.next()){
+				%>
+				<center>Queue Name - <%=newStr[newQCtr].toString() %> - Is already setup for admin<br></center>
+				<%
+			}else{
+				stmt.execute("INSERT INTO QADM_MSTR VALUES ("+newUtil.retLong()+","+qMgrID+",'"+newStr[newQCtr].toString().trim()+"')");
 				%>
 				<center>Queue Name - <%=newStr[newQCtr].toString() %> - Set up for Admin<br></center>
 				<%
-		}
-	}else{
-	boolean checkFlag = true;
-	for (int newQCtr=0;newQCtr<newStr.length;newQCtr++){
-		for (int oldQCtr=0;oldQCtr<setupQueue.size();oldQCtr++){
-			if (setupQueue.get(oldQCtr).toString().equals(newStr[newQCtr].toString().trim())){
-				checkFlag = false;
-				oldQCtr = setupQueue.size();
 			}
 		}
-		if (checkFlag){
-			FileUtils.writeStringToFile(queueFile, "\n"+newStr[newQCtr].toString().trim(), true);
-			
-		}
-		checkFlag = true;
+	}catch(Exception e){
 	%>
-	<center>Queue Name - <%=newStr[newQCtr].toString() %> - Set up for Admin<br></center>
-	<%
+		We have encountered the following error<br>
+		<font color=red><b><%=e%></b></font> 
+		<%
+	}finally{
+		rs.close();
+		newUtil.closeConn(conn);
 	}
 	}
 	
-}
-System.gc();
 %>
 
 </body>

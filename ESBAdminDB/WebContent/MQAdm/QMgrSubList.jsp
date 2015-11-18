@@ -41,9 +41,9 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			Util newUtil = new Util();
 			
 			try{
-				int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+				long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 				
-				String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
+				String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 											"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
 																" WHERE UQSM_USER_ID = '"+UserID+"' "+
 																" AND UQSM_QSM_ID = "+qMgrID+")";
@@ -53,11 +53,13 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 				int qPort=0;
 				String qHost = null;
 				String qChannel = null;
+				String gMgrName = null;
 			
 				if(rs.next()){
 					qPort = rs.getInt("QSM_QMGR_PORT");
 					qHost = rs.getString("QSM_QMGR_HOST");
 					qChannel = rs.getString("QSM_QMGR_CHL");
+					gMgrName = rs.getString("QSM_QMGR_NAME");
 				}
 		
 				
@@ -68,7 +70,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 				int listCtr =0;
 				int listCount =topicDtls.size();
 		%>
-		<b><u>List of Subscriptions in Queue Manager - <%=qMgrID %></u></b><br>
+		<b><u>List of Subscriptions in Queue Manager - <%=gMgrName %></u></b><br>
 		<table border=1 class="gridtable">
 			<tr>
 				<th><b>Sub Name</b></th>

@@ -39,18 +39,22 @@ if(session.getAttribute("UserID")==null){%>
 	</center>
 	<%	
 }else{
+	
 	String UserID = session.getAttribute("UserID").toString();
+	
 	Connection conn = null;
 	ResultSet rs = null;
 	Util newUtil = new Util();
 	
 	try{
-		int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+		
+		long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 		
 		String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 									"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
 														" WHERE UQSM_USER_ID = '"+UserID+"' "+
 														" AND UQSM_QSM_ID = "+qMgrID+")";
+		
 		conn = newUtil.createConn();
 		Statement stmt = conn.createStatement();
 		rs = stmt.executeQuery(usrQmgrQuery);
@@ -63,7 +67,6 @@ if(session.getAttribute("UserID")==null){%>
 			qHost = rs.getString("QSM_QMGR_HOST");
 			qChannel = rs.getString("QSM_QMGR_CHL");
 		}
-
 		
 		PCFCommons newPFCCM = new PCFCommons();
 			

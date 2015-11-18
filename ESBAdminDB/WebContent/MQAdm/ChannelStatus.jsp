@@ -48,14 +48,14 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			Util newUtil = new Util();
 
 			try{
-				int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+				long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 				
 				String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 											"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
 																" WHERE UQSM_USER_ID = '"+UserID+"' "+
 																" AND UQSM_QSM_ID = "+qMgrID+")";
 
-				System.out.println(usrQmgrQuery);
+				
 				conn = newUtil.createConn();
 				Statement stmt = conn.createStatement();
 				rs = stmt.executeQuery(usrQmgrQuery);
@@ -72,10 +72,13 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 					
 				}
 		
+				System.out.println(usrQmgrQuery);
 				PCFCommons newPFCCM = new PCFCommons();
 
 				String chlName = request.getParameter("chlName").toString();
+				
 				List<Map<String, Object>> chanelStat  = newPFCCM.channelStatus(qHost, qPort,chlName );
+				System.out.println(chlName);
 				
 		%>
 		<table border=1 align=center class="gridtable">

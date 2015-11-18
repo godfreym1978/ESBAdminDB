@@ -42,15 +42,25 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			ResultSet rs = null;
 			Util newUtil = new Util();
 			try{
-				int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+				long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 				
+				/*
 				String usrQmgrQuery = "SELECT QAM.QSM_Q_NAME, QSM.QSM_QMGR_CHL, QSM.QSM_QMGR_HOST, QSM.QSM_QMGR_NAME, QSM.QSM_QMGR_PORT "+ 
 											" FROM QADM_MSTR QAM, USER_QMGR_MSTR UQSM , QMGR_MSTR QSM "+
 											" WHERE QAM.QAM_UQSM_ID = UQSM.UQSM_ID "+
 											" AND QSM.QSM_ID = UQSM.UQSM_QSM_ID "+
 											" AND UQSM.UQSM_USER_ID = '"+UserID+"' "+
 											" AND UQSM.UQSM_QSM_ID = "+qMgrID;
-		
+				*/
+				
+
+				String usrQmgrQuery = "SELECT QAM.QSM_Q_NAME, QSM.QSM_QMGR_CHL, QSM.QSM_QMGR_HOST, QSM.QSM_QMGR_NAME, QSM.QSM_QMGR_PORT "+ 
+						" FROM QADM_MSTR QAM, USER_QMGR_MSTR UQSM , QMGR_MSTR QSM "+
+						" WHERE QSM.QSM_ID = UQSM.UQSM_QSM_ID "+
+						" AND UQSM.UQSM_USER_ID = '"+UserID+"' "+
+						" AND UQSM.UQSM_QSM_ID = "+qMgrID;
+
+				System.out.println(usrQmgrQuery);
 				conn = newUtil.createConn();
 				Statement stmt = conn.createStatement();
 				rs = stmt.executeQuery(usrQmgrQuery);

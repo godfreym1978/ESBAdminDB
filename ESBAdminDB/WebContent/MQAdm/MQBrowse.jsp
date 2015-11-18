@@ -32,11 +32,51 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			<b>Are you logged in to system? 
 			If not do so in <a href='../Index.html'>here </a></b>
 		<%} else {
+			Util newUtil = new Util();
+			Connection conn = null;
+			ResultSet rs = null;
+
+			String UserID = session.getAttribute("UserID").toString();
 			String qName = request.getParameter("QName").toString();
-			String qMgr = request.getParameter("QMgr").toString();
+			String qMgr = request.getParameter("qMgr").toString();
+			long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
+			
+			
+			String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
+					"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
+										" WHERE UQSM_USER_ID = '"+UserID+"' "+
+										" AND UQSM_QSM_ID = "+qMgrID+")";
+			String qHost = null;
+			String qChannel = null;
+			String gMgrName = null;
+
+			int qPort=0;
+
+			try{
+				conn = newUtil.createConn();
+				Statement stmt = conn.createStatement();
+				rs = stmt.executeQuery(usrQmgrQuery);
+				if(rs.next()){
+					qPort = rs.getInt("QSM_QMGR_PORT");
+					qHost = rs.getString("QSM_QMGR_HOST");
+					qChannel = rs.getString("QSM_QMGR_CHL");
+					gMgrName = rs.getString("QSM_QMGR_NAME");
+				}
+				
+			}catch(Exception e){
+			%>
+				We have encountered the following error<br>
+				<font color=red><b><%=e%></b></font> 
+				<%
+			}finally{
+				rs.close();
+				newUtil.closeConn(conn);
+			}
+		
+
 		%>
 		You have selected to browse the Queue - <b><%=qName%></b> 
-		/ Queue Manager - <b><%=qMgr%></b>
+		/ Queue Manager - <b><%=gMgrName%></b>
 		<%
 			int inCrement = 0;
 			int iCount = 0;
@@ -44,7 +84,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 
 			MQAdminUtil newMQAdUtil = new MQAdminUtil();
 			ArrayList<String> alQueueList = null;
-			alQueueList = newMQAdUtil.browseQueue(qMgr, qName);
+			alQueueList = newMQAdUtil.browseQueue(gMgrName, qName);
 			iCount = alQueueList.size();
 			if (iCount != 0) {
 		%>

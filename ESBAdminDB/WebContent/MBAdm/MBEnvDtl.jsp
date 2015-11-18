@@ -33,9 +33,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <title>Message Broker Environment</title>
 </head>
 <body>
-	<%
-	if(session.getAttribute("UserID")==null){
-	%>
+	<%if(session.getAttribute("UserID")==null){%>
 		<center>
 		Looks like you are not logged in.<br>
 		

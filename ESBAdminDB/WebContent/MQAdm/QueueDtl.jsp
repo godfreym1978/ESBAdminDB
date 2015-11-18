@@ -45,7 +45,7 @@ if(session.getAttribute("UserID")==null){%>
 	Util newUtil = new Util();
 	
 	try{
-		int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+		long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 		String qName = request.getParameter("qName");
 		
 		String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+

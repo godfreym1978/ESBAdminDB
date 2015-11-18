@@ -54,7 +54,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 	PCFCommons newPFCCM = new PCFCommons();
 	try{
 		
-		int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+		long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 
 		String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 									"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
@@ -66,27 +66,27 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 		int qPort=0;
 		String qHost = null;
 		String qChannel = null;
-		String qMgr = null;
+		String gMgrName = null;
 	
 		if(rs.next()){
 			qPort = rs.getInt("QSM_QMGR_PORT");
 			qHost = rs.getString("QSM_QMGR_HOST");
 			qChannel = rs.getString("QSM_QMGR_CHL");
-			qMgr = rs.getString("QSM_QMGR_NAME");
+			gMgrName = rs.getString("QSM_QMGR_NAME");
 		}
 
 		int msgPurged = newPFCCM.purgeQueue(qHost,qPort, qName, qChannel);
 
 		if (msgPurged<0){
-			msgPurged = newMQAdUtil.purgeQueue(qMgr, qName);
+			msgPurged = newMQAdUtil.purgeQueue(gMgrName, qName);
 			%>
 			<b><%=msgPurged%></b> Messages Purged from the Queue - <b><%=qName%></b>
-			- Queue Manager <b><%=qMgr%></b>
+			- Queue Manager <b><%=gMgrName%></b>
 			<%
 		}else{
 			%>
 			Messages Cleared from the Queue - <b><%=qName%></b>
-			- Queue Manager <b><%=qMgr%></b>
+			- Queue Manager <b><%=gMgrName%></b>
 			<%
 		}
 	}catch(SQLException e){

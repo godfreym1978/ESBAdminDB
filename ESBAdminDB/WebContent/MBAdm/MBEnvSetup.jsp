@@ -31,18 +31,13 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <title>Message Broker Environment</title>
 </head>
 <body>
-	<%
-	if(session.getAttribute("UserID")==null){
-	%>
+	<%if(session.getAttribute("UserID")==null){%>
 		<center>
 		Looks like you are not logged in.<br>
 		
 		Please login with a valid user id <a href='../Index.html'><b>Here</b> </a>
 		</center>
-	
-	<%	
-	}else{
-	%>
+	<%}else{%>
 			<center><h3> Message Broker Environment</h3></center>
 			<form action='MBEnvSave.jsp' method="get">
 
@@ -83,10 +78,6 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 					<td colspan=6><center><input type="submit" value="Save"/></center></td>
 				</tr>
 			</table>
-	<%	
-}		
-%>
-
-
+	<%}%>
 </body>
 </html>

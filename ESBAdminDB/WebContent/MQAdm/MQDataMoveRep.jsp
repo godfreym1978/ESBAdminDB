@@ -61,12 +61,13 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			int qPort=0;
 			String qHost = null;
 			String qChannel = null;
+			String gMgrName = null;
 			
 			if(rs.next()){
-			qPort = rs.getInt("QSM_QMGR_PORT");
-			qHost = rs.getString("QSM_QMGR_HOST");
-			qChannel = rs.getString("QSM_QMGR_CHL");
-			qMgr = rs.getString("QSM_QMGR_NAME");
+				qPort = rs.getInt("QSM_QMGR_PORT");
+				qHost = rs.getString("QSM_QMGR_HOST");
+				qChannel = rs.getString("QSM_QMGR_CHL");
+				gMgrName = rs.getString("QSM_QMGR_NAME");
 			}
 
 			PCFCommons newPFCCM = new PCFCommons();
@@ -91,7 +92,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 		<table border=1 align=center width=50% class="gridtable">
 			<tr>
 				<td>Queue Mgr</td>
-				<td><input type=hidden name=qMgr value=<%=qMgr%>><%=qMgr%></td>
+				<td><input type=hidden name=qMgr value=<%=gMgrName%>><%=gMgrName%></td>
 			</tr>
 			<tr>
 				<td>Source Queue</td>

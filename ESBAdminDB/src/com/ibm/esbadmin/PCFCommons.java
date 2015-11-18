@@ -254,7 +254,7 @@ public class PCFCommons {
 		
 		// Add the inquire rules.
 		// Topic name = wildcard.
-		pcfCmd.addParameter(MQConstants.MQCA_TOPIC_STRING, "TEST/TOPIC");
+		pcfCmd.addParameter(MQConstants.MQCA_TOPIC_STRING, topicString);
 		// Execute the command. The returned object is an array of PCF messages.
 		PCFMessage[] pcfResponse = agent.send(pcfCmd);
 		String strValue = new String();
@@ -870,8 +870,6 @@ public class PCFCommons {
 								.getParameterValue(MQConstants.MQCACH_MSG_EXIT_USER_DATA));
 				iMap.put("MQCACH_MSG_EXIT_NAME", pcfResponse[index]
 						.getParameterValue(MQConstants.MQCACH_MSG_EXIT_NAME));
-
-
 				iMap.put("MQIACH_PUT_AUTHORITY", pcfResponse[index]
 						.getParameterValue(MQConstants.MQIACH_PUT_AUTHORITY));
 				iMap.put(
@@ -990,13 +988,12 @@ public class PCFCommons {
 				new ArrayList<Map<String, Object>>();
 		Map<String, Object> iMap = new HashMap<String, Object>();
 
-
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort, chlName);
 
 		PCFMessage pcfCmd = new PCFMessage(
 				MQConstants.MQCMD_INQUIRE_CHANNEL_STATUS);
 		pcfCmd.addParameter(MQConstants.MQCACH_CHANNEL_NAME, chlName);
-		// pcfCmd.addParameter(MQConstants.MQIACH_CHANNEL_INSTANCE_ATTRS,MQConstants.MQCACH_CONNECTION_NAME);
+		//pcfCmd.addParameter(MQConstants.MQIACH_CHANNEL_INSTANCE_ATTRS,MQConstants.MQCACH_CONNECTION_NAME);
 
 		// Execute the command. The returned object is an array of PCF messages.
 		PCFMessage[] pcfResponse = agent.send(pcfCmd);
@@ -1142,7 +1139,6 @@ public class PCFCommons {
 					}
 				}
 
-
 				if(pcfResponse[index]
 						.getParameterValue(
 								MQConstants.MQIACH_STOP_REQUESTED)==null){
@@ -1183,7 +1179,6 @@ public class PCFCommons {
 						break;
 					}
 				}
-
 				
 				if(pcfResponse[index]
 						.getParameterValue(
@@ -1262,7 +1257,6 @@ public class PCFCommons {
 						iMap.put("MQIACH_CHANNEL_TYPE", "Cluster-sender");
 						break;
 					}
-
 				}
 				
 				int [] hdrCompArray = (int[]) pcfResponse[index]
@@ -1286,7 +1280,6 @@ public class PCFCommons {
 				
 				iMap.put("MQIACH_MSG_COMPRESSION", strHdrComp);
 
-				
 				if(pcfResponse[index]
 						.getParameterValue(
 								MQConstants.MQIACH_CHANNEL_STATUS)==null){
@@ -1460,8 +1453,6 @@ public class PCFCommons {
 				iMap.put("MQIACH_MSG_COMPRESSION", strMsgComp);
 				
 				channelStatus.add(iMap);
-				
-
 			}
 			agent.disconnect();
 		} catch (Exception e) {
@@ -1550,6 +1541,7 @@ public class PCFCommons {
 	public String createQueue(String qmgrHost, int qmgrPort, String qType,
 			String qName, boolean xmitType, String backoutQName, String qChannel)
 			throws PCFException, MQDataException, IOException {
+		
 		String resOutput = new String();
 
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
@@ -1719,7 +1711,7 @@ public class PCFCommons {
 	public void createListener(String qmgrHost, int qmgrPort, String listType,
 			String listName, int portNum, String qChannel) throws MQDataException, IOException {
 
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
 
@@ -1787,7 +1779,7 @@ public class PCFCommons {
 	public StringBuffer createQScript(String qmgrHost, int qmgrPort,
 			String qName, String qChannel) throws MQDataException, IOException {
 
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
 
@@ -2302,7 +2294,7 @@ public class PCFCommons {
 	public StringBuffer createChlScript(String qmgrHost, int qmgrPort,
 			String chlName, String qChannel) throws MQDataException, IOException {
 
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
 
@@ -2785,7 +2777,7 @@ public class PCFCommons {
 
 	public StringBuffer createListScript(String qmgrHost, int qmgrPort,
 			String listName, String qChannel) throws MQDataException, IOException {
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
@@ -2876,7 +2868,7 @@ public class PCFCommons {
 
 	public StringBuffer createTopicScript(String qmgrHost, int qmgrPort,
 			String topicName, String qChannel) throws MQDataException, IOException {
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
@@ -3113,7 +3105,7 @@ public class PCFCommons {
 
 	public StringBuffer createSubScript(String qmgrHost, int qmgrPort,
 			String subName, String qChannel) throws MQDataException, IOException {
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
@@ -3813,11 +3805,11 @@ public class PCFCommons {
 	public void moveQueue(String qmgrHost, int qmgrPort, String sourceQueue,
 			String targetQueue, String qChannel) throws PCFException, MQDataException,
 			IOException {
-		
+		/*
 		List<Map<String, Object>> subListDtl = 
 				new ArrayList<Map<String, Object>>();
 		Map<String, Object> iMap = new HashMap<String, Object>();
-
+		*/
 
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
@@ -3887,7 +3879,7 @@ public class PCFCommons {
 	public void deleteChannel(String qmgrHost, int qmgrPort, String chanName, String qChannel)
 			throws MQDataException, IOException {
 
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
 
@@ -3919,7 +3911,7 @@ public class PCFCommons {
 	public void deleteListener(String qmgrHost, int qmgrPort, String listName, String qChannel)
 			throws MQDataException, IOException {
 
-		PCFCommons pcfCM = new PCFCommons();
+		//PCFCommons pcfCM = new PCFCommons();
 		PCFMessageAgent agent = new PCFMessageAgent(qmgrHost, qmgrPort,
 				qChannel);
 

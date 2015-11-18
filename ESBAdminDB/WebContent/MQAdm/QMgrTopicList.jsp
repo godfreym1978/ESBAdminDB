@@ -45,9 +45,9 @@ if(session.getAttribute("UserID")==null){%>
 	Util newUtil = new Util();
 	
 	try{
-		int qMgrID = Integer.parseInt(request.getParameter("qMgr").toString());
+		long qMgrID = Long.parseLong(request.getParameter("qMgr").toString());
 		
-		String usrQmgrQuery = "SELECT QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
+		String usrQmgrQuery = "SELECT QSM_QMGR_NAME, QSM_QMGR_PORT, QSM_QMGR_HOST, QSM_QMGR_CHL  FROM QMGR_MSTR "+
 									"WHERE QSM_ID = (SELECT UQSM_QSM_ID FROM USER_QMGR_MSTR "+
 														" WHERE UQSM_USER_ID = '"+UserID+"' "+
 														" AND UQSM_QSM_ID = "+qMgrID+")";
@@ -57,11 +57,13 @@ if(session.getAttribute("UserID")==null){%>
 		int qPort=0;
 		String qHost = null;
 		String qChannel = null;
+		String qMgrName = null;
 	
 		if(rs.next()){
 			qPort = rs.getInt("QSM_QMGR_PORT");
 			qHost = rs.getString("QSM_QMGR_HOST");
 			qChannel = rs.getString("QSM_QMGR_CHL");
+			qMgrName = rs.getString("QSM_QMGR_NAME");
 		}
 		
 		PCFCommons newPFCCM = new PCFCommons();
@@ -70,7 +72,7 @@ if(session.getAttribute("UserID")==null){%>
 		int listCount =topicDtls.size();
 		%>
 
-		<center><b><u>List of Topics in Queue Manager - <%=qMgrID %></u></b></center><br>
+		<center><b><u>List of Topics in Queue Manager - <%=qMgrName  %></u></b></center><br>
 		<table border=1 align=center class="gridtable">
 			<tr>
 				<th><b>Topic Name</b></th>

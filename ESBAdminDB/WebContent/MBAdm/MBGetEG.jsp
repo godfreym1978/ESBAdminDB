@@ -19,6 +19,7 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 <%@ page import="com.ibm.esbadmin.*"%>
 <%@ page import="com.ibm.broker.config.proxy.*"%>
 <%@ page import="java.util.*"%>
+<%@ page import="java.sql.*"%>
 <%@ page import="org.apache.commons.csv.*"%>
 
 <%@ page
@@ -35,69 +36,92 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 
 </head>
 <body>
-<%if(session.getAttribute("UserID")==null){
-%>
+	<%if(session.getAttribute("UserID")==null){%>
 		<center>
 		Looks like you are not logged in.<br>
 		
 		Please login with a valid user id <a href='../Index.html'><b>Here</b> </a>
 		</center>
-<%	
-}else{
+	<%	
+	}else{
 		String UserID = session.getAttribute("UserID").toString();
 		Util newUtil = new Util();
 		MBCommons newMBCmn = new MBCommons();
 
-		List<Map<String, String>> MBList = newMBCmn.getMBEnv(UserID);
-
-		//File userFile = new File(System.getProperty("catalina.base")+File.separator+"ESBAdmin"+File.separator+session.getAttribute("UserID").toString()+File.separator+"MBEnv.txt");
-		String hostName = new String();
-		String env = null;
-		String egName = request.getParameter("egName");
-		String brokerName = request.getParameter("brokerName");
-		int portNum=0;
-		BrokerProxy brkProxy  = null;
-		String qMgr = null;
+		Connection conn = null;
+		ResultSet rs = null;
 		
-		for (int i=0; i<MBList.size(); i++) {
-			if(MBList.get(i).get("MBName").toString().equals(brokerName)){
-				hostName = MBList.get(i).get("MBHost").toString();
-				portNum = Integer.parseInt(MBList.get(i).get("MBPort").toString());
-				brkProxy = newMBCmn.getBrokerProxy(hostName, portNum);
-				break;
-			}
-		}
-		BrokerConnectionParameters bcp = new MQBrokerConnectionParameters(
-				hostName, portNum, "");
-		brkProxy = BrokerProxy.getInstance(bcp);
-		qMgr = brkProxy.getQueueManagerName(); 
+		try{
 
-		ArrayList<ApplicationProxy> appProxy = newMBCmn.getExecutionGroupDetails(brkProxy, egName);
-		ArrayList<MessageFlowProxy> egMFProxy = newMBCmn.getMFDetails(brkProxy,egName);
-		ExecutionGroupProxy egProxy =
-				brkProxy.getExecutionGroupByName(egName);
-		ArrayList<LibraryProxy> egLibraries = Collections.list(egProxy.getLibraries(null));
-				
-		int egLibCtr;
-		int egLibCount = egLibraries.size();
-		int egMFCount = egMFProxy.size();
-		int egMFCtr;
-		int appCount = appProxy.size();
-		ArrayList<MessageFlowProxy> appMFNames = null;
-		int mfCount;
-		int mfCtr;
-		ArrayList<LibraryProxy> libNames = null;
-		int libCount;
-		int libCtr;
-		String[] queueNames = null;
-		int qCtr;
-		int qCount;
-		 
-	%>
+			String hostName = new String();
+			String env = null;
+			String egName = request.getParameter("egName");
+			String brokerName = request.getParameter("brokerName");
+			int portNum=0;
+			BrokerProxy brkProxy  = null;
+			String qMgr = null;
+		
+			String usrIIBQuery = "SELECT IBMST_IIB_NAME, IBMST_IIB_HOST, IBMST_QMGR_PORT FROM IIB_MSTR "+
+					"WHERE IBMST_IIB_NAME = '"+brokerName+"'";
+			
+			conn = newUtil.createConn();
+			Statement stmt = conn.createStatement();
+			rs = stmt.executeQuery(usrIIBQuery);
+			int qPort=0;
+			String qHost = null;
+			String qChannel = null;
+		
+			if(rs.next()){
+				portNum = rs.getInt("IBMST_QMGR_PORT");
+				hostName = rs.getString("IBMST_IIB_HOST");
+			}
 	
+			brkProxy = newMBCmn.getBrokerProxy(hostName, portNum);
+			
+			BrokerConnectionParameters bcp = new MQBrokerConnectionParameters(
+					hostName, portNum, "");
+			brkProxy = BrokerProxy.getInstance(bcp);
+			String brkQMgr = brkProxy.getQueueManagerName();
+			String qMgrQuery = "SELECT QSM_ID FROM QMGR_MSTR "+
+								"WHERE QSM_QMGR_NAME = '"+brkQMgr+"' "+
+								" AND QSM_QMGR_PORT = "+portNum+
+								" AND QSM_QMGR_HOST = '"+hostName+"'";
+		
+			rs = stmt.executeQuery(qMgrQuery);
+	
+			if(rs.next()){
+				qMgr  = rs.getString("QSM_ID");
+			}
+
+			ArrayList<ApplicationProxy> appProxy = newMBCmn.getExecutionGroupDetails(brkProxy, egName);
+			ArrayList<MessageFlowProxy> egMFProxy = newMBCmn.getMFDetails(brkProxy,egName);
+			ExecutionGroupProxy egProxy =
+					brkProxy.getExecutionGroupByName(egName);
+			ArrayList<LibraryProxy> egLibraries = Collections.list(egProxy.getLibraries(null));
+					
+			int egLibCtr;
+			int egLibCount = egLibraries.size();
+			int egMFCount = egMFProxy.size();
+			int egMFCtr;
+			int appCount = appProxy.size();
+			ArrayList<MessageFlowProxy> appMFNames = null;
+			int mfCount;
+			int mfCtr;
+			ArrayList<LibraryProxy> libNames = null;
+			int libCount;
+			int libCtr;
+			String[] queueNames = null;
+			int qCtr;
+			int qCount;
+		%>
+	
+	<!-- 
 	<center><h3>Broker Name - <%=brkProxy.getName()%>
  / Execution Group - <a href="EGAuditRep.jsp?brokerName=<%=brokerName%>&egName=<%=egName%>"><%=egName%></a></h3></center>
- 
+  -->
+	<center><h3>Broker Name - <%=brkProxy.getName()%>
+ / Execution Group - <%=egName%></h3></center>
+  
  <%if((UserID.indexOf("dev-") ==0 && !env.equals("STG")&& !env.equals("PROD"))||UserID.equals("admin") ){%>
 		<Table border=1 align=center class="gridtable">
 			<tr>
@@ -139,8 +163,11 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 							mfCount = appMFNames.size();
 								for (mfCtr = 0; mfCount > mfCtr; mfCtr++) {
 									%><tr>
+									<!-- 
 									<td> <a href="MFAuditRep.jsp?brokerName=<%=brokerName%>&mfName='<%=appMFNames.get(mfCtr).getName()%>'">
 									<%=appMFNames.get(mfCtr).getName()%></a></td>
+									 -->
+									<td><%=appMFNames.get(mfCtr).getName()%></a></td>
 									<td> 
 									<%
 									queueNames = appMFNames.get(mfCtr).getQueues();
@@ -217,9 +244,12 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 			%>
 			<tr>
 				<td></td>
+				<!-- 
 				<td>
 				<a href="MFAuditRep.jsp?brokerName=<%=brokerName%>&mfName='<%=egMFProxy.get(egMFCtr).getName()%>'">
 				<%=egMFProxy.get(egMFCtr).getName()%></a></td>
+				 -->
+				<td><%=egMFProxy.get(egMFCtr).getName()%></a></td>
 				<td><%
 							queueNames = egMFProxy.get(egMFCtr).getQueues();
 							qCount = queueNames.length;
@@ -325,13 +355,15 @@ without the express written permission of Godfrey P Menezes(godfreym@gmail.com).
 				
 			<%
 				}
-			%>
-			
-			
-			<%
 			brkProxy.disconnect();
-			System.gc();
-			
+		}catch(Exception e){
+			%>
+			<center> <b>Experienced the following error  - </b></center><br>
+			<%
+		}finally{
+			rs.close();
+			newUtil.closeConn(conn);
+		}
 }
 
 %>		

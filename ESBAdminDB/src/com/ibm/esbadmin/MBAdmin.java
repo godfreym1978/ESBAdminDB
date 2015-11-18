@@ -15,6 +15,10 @@ package com.ibm.esbadmin;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -51,68 +55,79 @@ public class MBAdmin extends HttpServlet {
 			final HttpServletResponse response) throws ServletException, IOException {
 		// TODO Auto-generated method stub
 		// ServletContext ctx = getServletContext();
+		Connection conn = null;
+		ResultSet rs = null;
+		Statement stmt = null;
+		Util newUtil = new Util();
+
 		try {
 			HttpSession session = request.getSession(true);
 			MBCommons newMBComm = new MBCommons();
 			String action = request.getParameter("action").toString();
 			String userID = session.getAttribute("UserID").toString();
+			String brkName = request.getParameter("brkName").toString();
+			String brkHost = new String();
+			int brkPort = 0;
+			String env = new String();
+			
+			String usrIIBQuery = "SELECT IBMST_ENV, IBMST_IIB_HOST, IBMST_QMGR_PORT FROM USER_IIB_MSTR UIM, IIB_MSTR IM "+
+									" WHERE UIM.UIBM_USER_ID = '"+userID+"' "+
+									" AND IM.IBMST_IIB_NAME =  '"+brkName+"'"+
+									" AND UIM.UIBM_IBMST_ID = IM.IBMST_ID";
+ 			
+			conn = newUtil.createConn();
+			stmt = conn.createStatement();
+			rs = stmt.executeQuery(usrIIBQuery);
 
-			File userFile = new File(System.getProperty("catalina.base")
-					+ File.separator + "ESBAdmin" + File.separator + userID
-					+ File.separator + "MBEnv.txt");
-			String env = null;
-
-			for (String line : FileUtils.readLines(userFile)) {
-				CSVParser parser = CSVParser.parse(line, CSVFormat.RFC4180);
-				for (CSVRecord csvRecord : parser) {
-					env = csvRecord.get(0);
-					break;
-				}
+			if (rs.next()) {
+				env = rs.getString("IBMST_ENV");
+				brkHost = rs.getString("IBMST_IIB_HOST");
+				brkPort = rs.getInt("IBMST_QMGR_PORT");
 			}
 
 			if (userID.indexOf("admin") > -1
 					|| (env.equals("DEV") || env.equals("QA"))
 					&& userID.indexOf("dev") > -1) {
 				if (action.indexOf("EG") == 0) {
-					String brkName = request.getParameter("brkName").toString();
+					//brkName = request.getParameter("brkName").toString();
 					String egName = request.getParameter("egName").toString();
 					if (action.indexOf("start") > 0) {
 						System.out.println("Starting Execution Group - "
 								+ egName + " /Broker - " + brkName);
-						newMBComm.StartEG(brkName, egName, userID);
+						newMBComm.StartEG(brkName, egName, brkHost, brkPort);
 					} else if (action.indexOf("stop") > 0) {
 						System.out.println("Stopping Execution Group - "
 								+ egName + " /Broker - " + brkName);
-						newMBComm.StopEG(brkName, egName, userID);
+						newMBComm.StopEG(brkName, egName, brkHost, brkPort);
 					} else {
 						System.out.println("Deleting Execution Group - "
 								+ egName + " /Broker - " + brkName);
-						newMBComm.DeleteEG(brkName, egName, userID);
+						newMBComm.DeleteEG(brkName, egName, brkHost, brkPort);
 					}
 				} else if (action.indexOf("MF") == 0) {
-					String brkName = request.getParameter("brkName").toString();
+					//brkName = request.getParameter("brkName").toString();
 					String egName = request.getParameter("egName").toString();
 					String mfName = request.getParameter("mfName").toString();
 					if (action.indexOf("start") > 0) {
 						System.out.println("Starting MF - " + mfName
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
-						newMBComm.StartMsgFlow(brkName, egName, mfName, userID);
+						newMBComm.StartMsgFlow(brkName, egName, mfName, brkHost, brkPort);
 					} else if (action.indexOf("stop") > 0) {
 						System.out.println("Stopping MF - " + mfName
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
-						newMBComm.StopMsgFlow(brkName, egName, mfName, userID);
+						newMBComm.StopMsgFlow(brkName, egName, mfName, brkHost, brkPort);
 					} else {
 						System.out.println("Deleting MF - " + mfName
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
 						newMBComm.DeleteEGObject(brkName, egName, mfName,
-								userID);
+								brkHost, brkPort);
 					}
 				} else if (action.indexOf("APPL") == 0) {
 
-					String brkName = request.getParameter("brkName").toString();
+					//brkName = request.getParameter("brkName").toString();
 					String egName = request.getParameter("egName").toString();
 					String applName = request.getParameter("applName")
 							.toString();
@@ -121,29 +136,29 @@ public class MBAdmin extends HttpServlet {
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
 						newMBComm.StartApplication(brkName, egName, applName,
-								userID);
+								brkHost, brkPort);
 					} else if (action.indexOf("stop") > 0) {
 						System.out.println("Stopping Application - " + applName
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
 						newMBComm.StopApplication(brkName, egName, applName,
-								userID);
+								brkHost, brkPort);
 					} else {
 						System.out.println("Deleting Application - " + applName
 								+ "/ Execution Group - " + egName
 								+ " /Broker - " + brkName);
 						newMBComm.DeleteEGObject(brkName, egName, applName,
-								userID);
+								brkHost, brkPort);
 					}
 				} else if (action.indexOf("LIB") == 0) {
 
-					String brkName = request.getParameter("brkName").toString();
+					//brkName = request.getParameter("brkName").toString();
 					String egName = request.getParameter("egName").toString();
 					String libName = request.getParameter("libName").toString();
 					System.out.println("Deleting Library - " + libName
 							+ "/ Execution Group - " + egName + " /Broker - "
 							+ brkName);
-					newMBComm.DeleteEGObject(brkName, egName, libName, userID);
+					newMBComm.DeleteEGObject(brkName, egName, libName, brkHost, brkPort);
 				}
 
 			}
@@ -152,7 +167,16 @@ public class MBAdmin extends HttpServlet {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}finally{
+			try {
+				rs.close();
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			newUtil.closeConn(conn);
 		}
+
 	}
 
 }
