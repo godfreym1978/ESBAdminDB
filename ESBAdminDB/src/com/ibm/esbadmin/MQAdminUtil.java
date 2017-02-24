@@ -22,8 +22,6 @@ import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 
-import sun.misc.BASE64Decoder;
-
 import com.ibm.mq.MQEnvironment;
 import com.ibm.mq.MQException;
 import com.ibm.mq.MQGetMessageOptions;
@@ -35,18 +33,6 @@ import com.ibm.mq.MQQueue;
 import com.ibm.mq.MQQueueManager;
 import com.ibm.mq.headers.MQHeaderList;
 import com.ibm.mq.constants.MQConstants;
-import com.jcraft.jsch.Channel;
-import com.jcraft.jsch.ChannelExec;
-import com.jcraft.jsch.JSch;
-import com.jcraft.jsch.Session;
-
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 
 public class MQAdminUtil {
 
@@ -88,10 +74,10 @@ public class MQAdminUtil {
 
 		try {
 			// access the queue to query its depth
-			String qName = new String();
-			ArrayList qDepth = new ArrayList();
+			//String qName = new String();
+			//ArrayList qDepth = new ArrayList();
 			for (int i = 0; i < qList.size(); i++) {
-				qName = qList.get(i).toString();
+				//qName = qList.get(i).toString();
 				iMap = new HashMap<>();
 				com.ibm.mq.MQQueue queue = qmgr.accessQueue(qList.get(i)
 						.toString(), MQConstants.MQOO_INQUIRE
@@ -137,7 +123,7 @@ public class MQAdminUtil {
 
 			// Set up the options on the queue we wish to open
 			int openOptions = MQConstants.MQOO_BROWSE
-					| MQConstants.MQOO_INPUT_SHARED;
+					| MQConstants.MQOO_FAIL_IF_QUIESCING | MQConstants.MQOO_INQUIRE;
 
 			// Now specify the queue that we wish to open and the open options
 			queue = qMgr.accessQueue(queueName, openOptions, null, null, null);
@@ -148,11 +134,11 @@ public class MQAdminUtil {
 
 			getMessageOptions.waitInterval = 1000;
 			// Get the message off the queue.
-			int iCount = 0;
+			
 			byte[] b = null;
 			while (true) {
 
-				iCount++;
+				//iCount++;
 				MQMessage rcvMessage = new MQMessage();
 
 				queue.get(rcvMessage, getMessageOptions);
@@ -399,7 +385,7 @@ public class MQAdminUtil {
 	public ArrayList<String> messageMove(String qMgr, int qPortStr,
 			String qHost, String srcQueueName, String tarQueueName,
 			String msgCnt) throws MQException, IOException {
-		int qPort = qPortStr;
+		//int qPort = qPortStr;
 		int msgCount = 0;
 		if (!msgCnt.equals("all")) {
 			msgCount = Integer.parseInt(msgCnt);
@@ -493,7 +479,7 @@ public class MQAdminUtil {
 		MQQueue queue = null;
 		MQMessage msg = new MQMessage();
 		MQPoolToken token = MQEnvironment.addConnectionPoolToken();
-		StringBuffer qMsgs = null;
+		//StringBuffer qMsgs = null;
 		String qmessage = new String();
 		String interimMsg = new String();
 
@@ -544,67 +530,4 @@ public class MQAdminUtil {
 		return "hello";
 	}
 	
-	/*
-	public List<Map<String, String>> getQMEnv(String userID) throws XMLStreamException, IOException {
-		List<Map<String, String>> QMListDtl = new ArrayList<Map<String, String>>();
-		try{
-			Map<String, String> iMap = new HashMap<String, String>();
-			String tagContent = null;
-			File xmlFile = new File(System.getProperty("catalina.base")
-					+ File.separator + "ESBAdmin" + File.separator + userID + File.separator +   
-					"MQEnvironment.xml");
-
-			InputStream in = new FileInputStream(xmlFile);
-			XMLInputFactory factory = XMLInputFactory.newInstance();
-			XMLStreamReader reader = factory.createXMLStreamReader(in);
-
-			while (reader.hasNext()) {
-				int event = reader.next();
-				switch (event) {
-				case XMLStreamConstants.START_ELEMENT:
-					if ("QueueManager".equals(reader.getLocalName())) {
-						iMap = new HashMap();
-					}
-					break;
-				case XMLStreamConstants.CHARACTERS:
-					tagContent = reader.getText().trim();
-					break;
-				case XMLStreamConstants.END_ELEMENT:
-					switch (reader.getLocalName()) {
-					case "QueueManager":
-						QMListDtl.add(iMap);
-						break;
-					case "QMChannel":
-						iMap.put("QMChannel", tagContent);
-						break;
-					case "QMName":
-						iMap.put("QMName", tagContent);
-						break;
-					case "QMHost":
-						iMap.put("QMHost", tagContent);
-						break;
-					case "QMPort":
-						iMap.put("QMPort", tagContent);
-						break;
-					case "QMTimeID":
-						iMap.put("QMTimeID", tagContent);
-						break;
-					}
-					break;
-				case XMLStreamConstants.START_DOCUMENT:
-					QMListDtl = new ArrayList<Map<String, String>>();
-					break;
-				}
-			}
-			in.close();
-		} catch (XMLStreamException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		
-		return QMListDtl;
-	}
-	
-	*/
 }

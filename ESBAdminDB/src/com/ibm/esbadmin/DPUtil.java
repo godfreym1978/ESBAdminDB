@@ -26,7 +26,7 @@ import com.ibm.datapower.wamt.clientAPI.ManagedSet;
 import com.ibm.datapower.wamt.clientAPI.Manager;
 import com.ibm.datapower.wamt.clientAPI.ProgressContainer;
 import com.ibm.datapower.wamt.clientAPI.RuntimeService;
-import com.ibm.mq.constants.MQConstants;
+
 
 public class DPUtil {
 
@@ -62,7 +62,6 @@ public class DPUtil {
 			}
 			ms.addDevice(device1);
 
-			int deviceCtr = 0;
 			StringCollection sc = device1.getAllDomainNames();
 			int domainCtr = 0;
 			while (domainCtr < sc.size()) {
@@ -88,9 +87,6 @@ public class DPUtil {
 			// instance since the manager is a singleton.
 			Manager manager = Manager.getInstance(null);
 
-			// Go ahead and declare the progressContainer var, it will be used a
-			// few times.
-			ProgressContainer progressContainer = null;
 
 			// Create device object, note the use of a ProgressContainer since
 			// the amount of time needed
@@ -147,9 +143,6 @@ public class DPUtil {
 			// instance since the manager is a singleton.
 			Manager manager = Manager.getInstance(null);
 
-			// Go ahead and declare the progressContainer var, it will be used a
-			// few times.
-			ProgressContainer progressContainer = null;
 
 			// Create device object, note the use of a ProgressContainer since
 			// the amount of time needed
@@ -194,10 +187,6 @@ public class DPUtil {
 			// getInstance will return the same
 			// instance since the manager is a singleton.
 			Manager manager = Manager.getInstance(null);
-
-			// Go ahead and declare the progressContainer var, it will be used a
-			// few times.
-			ProgressContainer progressContainer = null;
 
 			// Create device object, note the use of a ProgressContainer since
 			// the amount of time needed
@@ -250,10 +239,6 @@ public class DPUtil {
 			// getInstance will return the same
 			// instance since the manager is a singleton.
 			Manager manager = Manager.getInstance(null);
-
-			// Go ahead and declare the progressContainer var, it will be used a
-			// few times.
-			ProgressContainer progressContainer = null;
 
 			// Create device object, note the use of a ProgressContainer since
 			// the amount of time needed
